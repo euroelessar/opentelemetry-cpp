@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <memory>
 #include "opentelemetry/common/spin_lock_mutex.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
+#include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
@@ -14,6 +14,7 @@
 #include "opentelemetry/sdk/metrics/data/point_data.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
 
+#include <memory>
 #include <mutex>
 
 OPENTELEMETRY_BEGIN_NAMESPACE
@@ -83,6 +84,10 @@ public:
         {
           return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config));
         }
+        break;
+      case AggregationType::kBase2ExponentialHistogram:
+        return std::unique_ptr<Aggregation>(
+            new Base2ExponentialHistogramAggregation(aggregation_config));
         break;
       case AggregationType::kLastValue:
         if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
